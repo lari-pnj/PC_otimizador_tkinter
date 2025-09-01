@@ -6,10 +6,11 @@ from tkinter import Tk
 janela = Tk()
 janela.title('otimizador')
 janela.geometry('650x450')
+#janela.configure(background="#3D373D")
 
 #imagem de backgroud
 
-fundo = PhotoImage(file="backgroud1.png")  
+fundo = PhotoImage(file="main\\backgroud1.png")
 label_fundo = Label(janela, image=fundo)
 label_fundo.place(x=0, y=0, relwidth=1, relheight=1)
 
