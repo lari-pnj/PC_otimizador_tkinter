@@ -1,7 +1,8 @@
 # PC otimizador tkinter
 
-![Screenshot](main\fundo1.png)
+![Screenshot](main/fundo1.png)
 
+---------
 Um otimizador,**Fácil e intuitivo**,
 Criado para otimizar o seu computador com algumas configurações automaticas.
 
@@ -20,6 +21,7 @@ otimizações reais do sistema
 
 ## Tecnologias usadas
 -python 3.x
+
 -Tkinter (GUI)
 
 --------
