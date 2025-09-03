@@ -9,7 +9,7 @@ otimizações reais do sistema
 
 ------
 
-![Screenshot](otimizador v1.0 img\fundo1.png)
+![Screenshot](main\fundo1.png)
 
 ------
 ## Funcionalidades Futuras
