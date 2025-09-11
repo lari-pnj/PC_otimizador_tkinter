@@ -25,13 +25,13 @@ def desinstalar_app():
 def atualizar_drives():
    executar_acao('🔄atualizando drives...', cor='lightblue', tempo=2000)
 
-def excluir_arquivos():
+def limpar_arquivos_desnecessarios():
    executar_acao('🗑️excluindo arquivos...', cor='lightgray', tempo=2000)
 
 def recursos_energia():
    executar_acao('⚡ajustando recursos de energia...', cor='red', tempo=2000)
 
-def limpar_cache():
+def limpar_cache_navegador():
    executar_acao('🧹limpando cache...', cor='lightgreen', tempo=2000)
 
 def desfragmentar_disco():
@@ -75,9 +75,9 @@ botoes = [
     ('⚡desativar recursos', desativar_recursos),
     ('🗑️desinstalar app', desinstalar_app),
     ('🔄atualizar drives', atualizar_drives),
-    ('🗑️excluir arquivos', excluir_arquivos),
+    ('🗑️limpar arquivos desnecessarios', limpar_arquivos_desnecessarios),
     ('⚡recursos energia', recursos_energia),
-    ('🧹limpar cache', limpar_cache),
+    ('🧹limpar cache navegador', limpar_cache_navegador),
     ('💽desfragmentar disco', desfragmentar_disco),
     ('🎨configuracoes visuais', configuracoes_visuais),
     ('🧹limpar prefetch/temp', limpar_prefetch_temp),
