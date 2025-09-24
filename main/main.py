@@ -6,6 +6,18 @@ import time
 
 
 #====================== Funções simulando as otimizações===========================================
+
+def add_hover_effect(widget, 
+    color_hover='#3a3a3a',
+    color_normal='#3e3e4e'):
+      def on_enter(e):
+          widget['background']= color_hover
+      def on_leave(e): 
+          widget['background']= color_normal
+      widget.bind("<Enter>", on_enter)
+      widget.bind("<Leave>", on_leave)   
+
+
 def atualizar_status(texto, cor='white'):
     historico_status.insert(END, texto)
     historico_status.itemconfig(tk.END, fg=cor)
@@ -45,6 +57,9 @@ def limpar_prefetch_temp():
 
 def apps_inicializacao():
    executar_acao('🔄ajustando apps de inicializacao...', cor='purple', tempo=2000)
+   
+def monitorar_temperatura():
+    executar_acao('🔍monitorando temperatura...', cor='lightblue', tempo=2000)   
 
 
 def finalizar_acao(texto):
@@ -66,7 +81,7 @@ janela.iconbitmap('main\\icon.ico')
 
 # ======================Frame lateral==========================================
 
-frame_menu = Frame(janela, bg='#2e2e3e', width=200)
+frame_menu = Frame(janela, bg='#2e2e3e', width=250)
 frame_menu.pack(side='left', fill='y')
 
 #criando os botoes do menu
@@ -75,13 +90,14 @@ botoes = [
     ('⚡desativar recursos', desativar_recursos),
     ('🗑️desinstalar app', desinstalar_app),
     ('🔄atualizar drives', atualizar_drives),
-    ('🗑️limpar arquivos desnecessarios', limpar_arquivos_desnecessarios),
+    ('limpar arquivos desnecessarios', limpar_arquivos_desnecessarios),
     ('⚡recursos energia', recursos_energia),
     ('🧹limpar cache navegador', limpar_cache_navegador),
     ('💽desfragmentar disco', desfragmentar_disco),
     ('🎨configuracoes visuais', configuracoes_visuais),
     ('🧹limpar prefetch/temp', limpar_prefetch_temp),
     ('🔄apps de inicializacao', apps_inicializacao),
+    ('🔍monitorar temperatura', monitorar_temperatura),  # recurso futuro
     ('❌Sair', Sair, '#a33')
 ]
 
@@ -93,11 +109,12 @@ for item in botoes:
         texto, command = item
         bg_color = '#3e3e4e'
     tk.Button(
-        frame_menu, text=texto, command=command,
-        font=('Arial', 12, 'bold'), bg=bg_color, fg='white',
+        frame_menu, text=texto, command=command, anchor='center', width=25,
+        font=('Arial', 10, 'bold'), bg=bg_color, fg='white',
         activebackground='#57576e', activeforeground='white',
         relief='flat', pady=10
-    ).pack(fill='x', pady=2, padx=5)
+    ).pack(fill='x', pady=2, padx=2)
+    add_hover_effect(widget=frame_menu.winfo_children()[-1])
     
 #======================Frame principal==========================================
 frame_main = Frame(janela, bg='#1e1e2e')

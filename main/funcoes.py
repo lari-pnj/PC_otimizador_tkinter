@@ -2,6 +2,7 @@ import os
 import subprocess
 import psutil
 import shutil
+import tempfile
 
 
 # Desativar recursos desnecessários pode tornar o sistema mais leve e rápido, 
