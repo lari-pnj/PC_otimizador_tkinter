@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk, messagebox
 import tkinter as tk
 import time
+from funcoes import *
 
 
 
@@ -30,36 +31,47 @@ def executar_acao(texto, cor='white', tempo=2000):
       
 def desativar_recursos():
    executar_acao('⚡desativando recursos...', cor='lightgreen', tempo=2000)
+   desativar_recursos_func()
 
 def desinstalar_app():
    executar_acao('🗑️desinstalando app...', cor='yellow', tempo=2000)
+   desinstalar_app_func()
 
-def atualizar_drives():
+def atualizar_drives(): 
    executar_acao('🔄atualizando drives...', cor='lightblue', tempo=2000)
+   atualizar_drives_func()
 
-def limpar_arquivos_desnecessarios():
+def limpar_arquivos_desnecessarios(): # ABRIR COMO ADMIN
    executar_acao('🗑️excluindo arquivos...', cor='lightgray', tempo=2000)
+   limpar_arquivos_desnecessarios_func()
 
-def recursos_energia():
+def recursos_energia(): 
    executar_acao('⚡ajustando recursos de energia...', cor='red', tempo=2000)
+   recursos_energia_func()
 
-def limpar_cache_navegador():
+def limpar_cache_navegador(): # STATUS NA TELA DO APP
    executar_acao('🧹limpando cache...', cor='lightgreen', tempo=2000)
+   limpar_cache_navegador_func()
 
-def desfragmentar_disco():
+def desfragmentar_disco(): # ABRIR COMO ADMIN
    executar_acao('💽desfragmentando disco...', cor='lightgray', tempo=2000)
+   desfragmentar_disco_func()
 
 def configuracoes_visuais():
    executar_acao('🎨configurando visual...', cor='orange', tempo=2000)
+   configuracoes_visuais_func()
 
-def limpar_prefetch_temp():
+def limpar_prefetch_temp(): # STATUS NA TELA
    executar_acao('🧹limpando prefetch/temp...', cor='blue', tempo=2000)
+   limpar_prefetch_temp_func()
 
 def apps_inicializacao():
    executar_acao('🔄ajustando apps de inicializacao...', cor='purple', tempo=2000)
+   apps_inicializacao_func()
    
 def monitorar_temperatura():
-    executar_acao('🔍monitorando temperatura...', cor='lightblue', tempo=2000)   
+    executar_acao('🔍monitorando temperatura...', cor='lightblue', tempo=2000) 
+    monitorar_temperatura_func()  
 
 
 def finalizar_acao(texto):
@@ -97,7 +109,7 @@ botoes = [
     ('🎨configuracoes visuais', configuracoes_visuais),
     ('🧹limpar prefetch/temp', limpar_prefetch_temp),
     ('🔄apps de inicializacao', apps_inicializacao),
-    ('🔍monitorar temperatura', monitorar_temperatura),  # recurso futuro
+    ('🔍monitorar temperatura', monitorar_temperatura),
     ('❌Sair', Sair, '#a33')
 ]
 
@@ -109,7 +121,7 @@ for item in botoes:
         texto, command = item
         bg_color = '#3e3e4e'
     tk.Button(
-        frame_menu, text=texto, command=command, anchor='center', width=25,
+        frame_menu, text=texto, command=lambda c=command: c(), anchor='center', width=25,
         font=('Arial', 10, 'bold'), bg=bg_color, fg='white',
         activebackground='#57576e', activeforeground='white',
         relief='flat', pady=10

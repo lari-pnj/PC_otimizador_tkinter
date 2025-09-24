@@ -7,102 +7,114 @@ import tempfile
 
 # Desativar recursos desnecessários pode tornar o sistema mais leve e rápido, 
 # ao impedir o carregamento de programas e serviços que você não usa. 
-def desativar_recursos():
-     subprocess.run('OpitionalFeature.exe', shell=True)
-     print('recurso não adicionado')
+def desativar_recursos_func():
+     os.startfile(r"C:\Windows\System32\OptionalFeatures.exe")
+     
 
 
 #Abre os programas instalados no pc
-def desinstalar_app():
+def desinstalar_app_func():
      subprocess.run('appwiz.cpl', shell = True)
      
 
 
 #Verificar drives a serem atualizados
-def atualizar_drives():
-     print('recurso não adicionado')
+def atualizar_drives_func():
+     os.startfile("devmgmt.msc")
 
 
 #Função para limpar pastas com arquivos desnecessarios-----------------------------------
 
-def limpar_arquivos_desnecessarios(caminho):
-     if os.path.exists(caminho):
-      for arquivo in os.listdir(caminho):
-           caminho_arquivo = os.path.join(caminho , arquivo)
-           try:
-                if os.path.isfile(caminho_arquivo) or os.path.islink(caminho_arquivo):
-                     os.unlink(caminho_arquivo)
-                elif os.path.isdir(caminho_arquivo):
-                     shutil.rmtree(caminho_arquivo)
-           except Exception as e:
-                print(f'Não foi possivel apagar{caminho_arquivo}: {e}')    
-       
-# #caminhos das pastas
-pasta_temp_sistem = r"C:\Windows\Temp"
-pasta_temp_usuario = tempfile.gettempdir()  # isso pega %temp%
-pasta_prefetch = r"C:\Windows\Prefetch"
-
-# # Limpar as pastas
-print("Limpando pastas temporárias...")
-limpar_arquivos_desnecessarios(pasta_temp_sistem)
-limpar_arquivos_desnecessarios(pasta_temp_usuario)
-limpar_arquivos_desnecessarios(pasta_prefetch)
-print("Limpeza concluída!")
-                           
+def limpar_arquivos_desnecessarios_func():
+     # Pastas a limpar
+     pastas = [
+     r"C:\Windows\Temp",      # Pasta Temp do sistema
+     os.environ.get('TEMP')   # Pasta Temp do usuário (%Temp%)
+     ]
+     for pasta in pastas:
+          if os.path.exists(pasta):
+               for item in os.listdir(pasta):
+                    item_path = os.path.join(pasta, item)
+                    try:
+                         if os.path.isfile(item_path) or os.path.islink(item_path):
+                              os.remove(item_path)  # Apaga arquivos
+                         elif os.path.isdir(item_path):
+                              shutil.rmtree(item_path)  # Apaga pastas
+                         print(f"Apagado: {item_path}")
+                    except PermissionError:
+                         print(f"Sem permissão para apagar: {item_path}")
+                    except Exception as e:
+                         print(f"Erro ao apagar {item_path}: {e}")
+          else:
+               print(f"Pasta não encontrada: {pasta}")
 
 
 # Abre a janela de Opções de Energia
-def recursos_energia():
+def recursos_energia_func():
      subprocess.run('powercfg.cpl', shell = True)
      
 
 
 #limpar o cache do navegador CHROME
-def limpar_cache_navegador():
+def limpar_cache_navegador_func():
      chrome_cache = os.path.expandvars(r"%LOCALAPPDATA%\Google\Chrome\User Data\Default\Cache")
-     limpar_arquivos_desnecessarios(chrome_cache)
+     limpar_arquivos_desnecessarios_func(chrome_cache)
      print("Cache do Chrome limpo!")
-     print('recurso não adicionado')
      
-     
-
  # Desfragmentar a unidade C: necessario só para hd:
-def desfragmentar_disco():
+def desfragmentar_disco_func():
      subprocess.run("defrag C: /O", shell=True)
      
      
 
 # Abrir Configurações Avançadas de Desempenho (Efeitos Visuais)
-def configuracoes_visuais():
+def configuracoes_visuais_func():
      subprocess.run("SystemPropertiesPerformance.exe", shell=True)
      
 
+#DELETA A PASTA PREFETCH
 
-def limpar_prefetch_temp():
-     print('recurso não adicionado')
+def limpar_prefetch_temp_func():
+# Caminho da pasta Prefetch
+     prefetch_path = r"C:\Windows\Prefetch"
+
+     # Verifica se a pasta existe
+     if os.path.exists(prefetch_path):
+     # Lista os arquivos
+          for file in os.listdir(prefetch_path):
+               file_path = os.path.join(prefetch_path, file)
+               try:
+                    if os.path.isfile(file_path):
+                         os.remove(file_path)  # Apaga arquivos
+                         print(f"Apagado: {file_path}")
+               except PermissionError:
+                    print(f"Sem permissão para apagar: {file_path}")
+               except Exception as e:
+                    print(f"Erro ao apagar {file_path}: {e}")
+          else:
+           print("Pasta Prefetch não encontrada.")
+
     
     
 # Abre a pasta de inicialização do usuário
-def apps_inicializacao(): 
+def apps_inicializacao_func(): 
     subprocess.run("taskmgr", shell=True)
     
-
-
+# Abre o monitor de recursos para monitorar a temperatura
+def monitorar_temperatura_func():
+     subprocess.run("resmon.exe", shell=True)
 
 #Recursos futuros-------------------------------------------------------------------------------------------------------
-
-def monitorar_temperatura():
-     subprocess.run("resmon.exe", shell=True)
-     
+    
      
 #Liberar cache do DNS (pode acelerar internet às vezes)  
-def limpar_cache_dns():
-     subprocess.run('ipconfig /flushdns', shell = True) 
+# def limpar_cache_dns():
+#      subprocess.run('ipconfig /flushdns', shell = True) 
      
-resultado = subprocess.run("ipconfig /flushdns", shell=True, capture_output=True, text=True)
+# resultado = subprocess.run("ipconfig /flushdns", shell=True, capture_output=True, text=True)
 
-print("Saída:")
-print(resultado.stdout)
-print("Erros:")
-print(resultado.stderr)  
+# print("Saída:")
+# print(resultado.stdout)
+# print("Erros:")
+# print(resultado.stderr)  
     
