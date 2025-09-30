@@ -6,9 +6,9 @@ from funcoes import *
 from tktooltip import ToolTip
 import subprocess
 
-#============================================= Funções================================================================
+#=============================================Funções-Locais================================================================
 
-# Função para modificar a cor dos botões quando o mouse passa por cima
+# Função para modificar a cor dos botões quando o mouse passa por cima "Hover Effect"-----
 def add_hover_effect1(widget, 
     color_hover='#3a3a3a',
     color_normal='#3e3e4e'):

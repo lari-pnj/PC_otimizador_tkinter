@@ -5,25 +5,23 @@ import shutil
 import tempfile
 
 
-# Desativar recursos desnecessários pode tornar o sistema mais leve e rápido, 
-# ao impedir o carregamento de programas e serviços que você não usa. 
+# Desativar recursos desnecessários pode tornar o sistema mais leve e rápido===================================
+
 def desativar_recursos_func():
      os.startfile(r"C:\Windows\System32\OptionalFeatures.exe")
      
 
-
-#Abre os programas instalados no pc
+# Abre os programas instalados no pc
 def desinstalar_app_func():
      subprocess.run('appwiz.cpl', shell = True)
      
 
-
-#Verificar drives a serem atualizados
+# Verificar drives a serem atualizados
 def atualizar_drives_func():
      os.startfile("devmgmt.msc")
 
 
-#Função para limpar pastas com arquivos desnecessarios-----------------------------------
+# Função para limpar pastas com arquivos desnecessarios
 
 def limpar_arquivos_desnecessarios_func():
      # Pastas a limpar
@@ -52,27 +50,24 @@ def limpar_arquivos_desnecessarios_func():
 # Abre a janela de Opções de Energia
 def recursos_energia_func():
      subprocess.run('powercfg.cpl', shell = True)
-     
 
 
-#limpar o cache do navegador CHROME
+# Limpar o cache do navegador CHROME
 def limpar_cache_navegador_func():
      chrome_cache = os.path.expandvars(r"%LOCALAPPDATA%\Google\Chrome\User Data\Default\Cache")
      limpar_arquivos_desnecessarios_func(chrome_cache)
      print("Cache do Chrome limpo!")
      
- # Desfragmentar a unidade C: necessario só para hd:
+# Desfragmentar a unidade C: necessario só para hd:
 def desfragmentar_disco_func():
      subprocess.run("defrag C: /O", shell=True)
      
      
-
 # Abrir Configurações Avançadas de Desempenho (Efeitos Visuais)
 def configuracoes_visuais_func():
      subprocess.run("SystemPropertiesPerformance.exe", shell=True)
-     
 
-#DELETA A PASTA PREFETCH
+# DELETA A PASTA PREFETCH
 
 def limpar_prefetch_temp_func():
 # Caminho da pasta Prefetch
@@ -94,9 +89,9 @@ def limpar_prefetch_temp_func():
           else:
            print("Pasta Prefetch não encontrada.")
 
-    
-    
+
 # Abre a pasta de inicialização do usuário
+
 def apps_inicializacao_func(): 
     subprocess.run("taskmgr", shell=True)
     
