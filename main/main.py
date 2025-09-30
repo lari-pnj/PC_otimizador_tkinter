@@ -149,7 +149,7 @@ janela.title('otimizador Aoxy v1.0')
 janela.geometry('800x600')
 janela.config(background="#1e1e2e")
 janela.resizable(False, False)
-janela.iconbitmap('main\\icon.ico')
+janela.iconbitmap('img/icon.ico')
 
 # ======================Frame lateral==========================================
 
