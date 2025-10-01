@@ -1,0 +1,9 @@
+#Sobre
+
+Este aplicativo foi desenvolvido em Tkinter puro com o objetivo de 
+oferecer uma solução simples e prática para otimização do sistema Windows.
+Com 11 funções principais, ele reúne em um só lugar atalhos e ferramentas
+que ajudam a melhorar o desempenho e facilitar a manutenção do computador:
+
+O foco é ser um utilitário leve, intuitivo e direto ao ponto,
+ajudando você a manter seu computador mais rápido, estável e organizado.
