@@ -288,9 +288,22 @@ notebook.add(aba_sobre, text="Sobre")
 
 tk.Label(aba_sobre, text="Otimizador Aoxy v1.0", font=("Heavitas", 16, "normal"),
          bg="#1b1b2f", fg="lightblue").pack(pady=20)
-tk.Label(aba_sobre, text="Desenvolvido com Python e Tkinter puro.\nTodos os recursos são simulados para demonstração.",
-         font=("Caviar Dreams", 12, "bold"), bg="#1b1b2f", fg="white").pack(pady=10)
+tk.Label(aba_sobre, font=("Caviar Dreams", 12, "bold"), bg="#1b1b2f", fg="white").pack(pady=10)
 
+try:
+    with open("info/sobre.txt", "r", encoding="utf-8") as f:
+        conteudo_sobre = f.read()
+except FileNotFoundError:
+    conteudo_sobre = "Arquivo 'sobre.txt' não encontrado.\nColoque-o na mesma pasta do programa."
+    
+# Exibir o texto no widget
+texto_sobre = tk.Text(aba_sobre, wrap="word", bg="#2c2c44", fg="white",
+                      font=("Caviar Dreams", 11 , 'bold'), relief="flat", height=15)
+texto_sobre.insert("1.0", conteudo_sobre)
+texto_sobre.config(state="disabled") 
+texto_sobre.pack(side="top", fill="x", padx=10, pady=10)    
+
+#===================================================================================================
 
 # Barra de progresso
 
