@@ -5,6 +5,15 @@ import time
 from funcoes import *
 from tktooltip import ToolTip
 import subprocess
+import os, sys
+
+def resource_path(relative_path):
+    """Encontra o caminho do arquivo mesmo dentro do .exe"""
+    try:
+        base_path = sys._MEIPASS 
+    except Exception:
+        base_path = os.path.abspath(".") 
+    return os.path.join(base_path, relative_path)
 
 #=============================================Funções-Locais================================================================
 
@@ -149,7 +158,8 @@ janela.title('otimizador Aoxy v1.0')
 janela.geometry('800x600')
 janela.config(background="#1e1e2e")
 janela.resizable(False, False)
-janela.iconbitmap('img/icon.ico')
+janela.iconbitmap(resource_path("img/icon.ico"))
+
 
 # ======================Frame lateral==========================================
 
