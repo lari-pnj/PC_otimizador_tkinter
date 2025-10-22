@@ -6,6 +6,48 @@ from funcoes import *
 from tktooltip import ToolTip
 import subprocess
 import os, sys
+from io import StringIO
+
+# variável que guarda o último ponto de restauração criado
+ultimo_ponto = None
+
+# Exige que o app seja executado como Administrador: se não for, relança com UAC e encerra esta instância
+def ensure_run_as_admin():
+    try:
+        import ctypes
+        try:
+            is_admin = ctypes.windll.shell32.IsUserAnAdmin()
+        except Exception:
+            is_admin = False
+        if not is_admin:
+            # monta argumentos a serem repassados
+            extra_args = ''
+            for a in sys.argv[1:]:
+                # protege espaços
+                extra_args += f' "{a}"'
+
+            try:
+                if getattr(sys, 'frozen', False):
+                    # executável empacotado
+                    ctypes.windll.shell32.ShellExecuteW(None, 'runas', sys.executable, extra_args, None, 1)
+                else:
+                    script = os.path.abspath(__file__)
+                    params = f'"{script}"' + extra_args
+                    ctypes.windll.shell32.ShellExecuteW(None, 'runas', sys.executable, params, None, 1)
+            except Exception:
+                print('Falha ao solicitar elevação via UAC.')
+            sys.exit(0)
+    except Exception:
+        # se algo falhar, não bloqueia demais; seguirá sem elevação
+        return
+
+# chama no início
+ensure_run_as_admin()
+
+# Verifica se o app foi iniciado com a flag para criar ponto automaticamente (após elevação)
+do_create_on_startup = False
+if '--create-restore' in sys.argv:
+    do_create_on_startup = True
 
 def resource_path(relative_path):
     """Encontra o caminho do arquivo mesmo dentro do .exe"""
@@ -55,14 +97,63 @@ def add_hover_effect3(widget,
 def criar_ponto_restauracao():
     global ultimo_ponto
     try:
-        # cria ponto de restauração no Windows
+        # Verifica se temos privilégios de administrador
+        import ctypes
+        try:
+            is_admin = ctypes.windll.shell32.IsUserAnAdmin()
+        except Exception:
+            is_admin = False
+
+        if not is_admin:
+            atualizar_status("⚠️ É necessário executar o aplicativo como Administrador para criar um ponto de restauração.", cor="orange")
+            # tenta relançar com elevação e sinalizar para criar o ponto automaticamente
+            try:
+                args = '"' + os.path.abspath(__file__) + '" --create-restore'
+                ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, args, None, 1)
+            except Exception:
+                atualizar_status("❌ Falha ao solicitar elevação. Execute o app como Administrador manualmente.", cor="red")
+            return
+        # Tentativa: verificar e habilitar serviços necessários (srservice e VSS)
+        atualizar_status("🔎 Verificando serviços necessários (srservice, VSS)...", cor="white")
+        try:
+            # Habilita e inicia srservice
+            subprocess.run(["powershell", "-Command", "Set-Service -Name srservice -StartupType Automatic -ErrorAction SilentlyContinue"], check=False)
+            subprocess.run(["powershell", "-Command", "Start-Service -Name srservice -ErrorAction SilentlyContinue"], check=False)
+            # Habilita e inicia VSS (Volume Shadow Copy) como Manual
+            subprocess.run(["powershell", "-Command", "Set-Service -Name VSS -StartupType Manual -ErrorAction SilentlyContinue"], check=False)
+            subprocess.run(["powershell", "-Command", "Start-Service -Name VSS -ErrorAction SilentlyContinue"], check=False)
+        except Exception as srv_e:
+            atualizar_status(f"⚠️ Falha ao ajustar serviços: {srv_e}", cor="orange")
+
+        # Verificar se System Protection está ativado na unidade C:
+        atualizar_status("🔎 Verificando Proteção do Sistema na unidade C:\\...", cor="white")
+        try:
+            # Tenta habilitar a restauração para C:\ se ainda não estiver
+            subprocess.run(["powershell", "-Command", "Enable-ComputerRestore -Drive 'C:\\'"], check=False)
+        except Exception as en_e:
+            atualizar_status(f"⚠️ Não foi possível habilitar Proteção do Sistema: {en_e}", cor="orange")
+
+        # Agora tenta criar o ponto de restauração
+        atualizar_status("⏳ Criando ponto de restauração...", cor="white")
         subprocess.run([
             "powershell",
             "-Command",
             "Checkpoint-Computer -Description 'Ponto_Otimizador_Aoxy' -RestorePointType 'MODIFY_SETTINGS'"
         ], check=True)
-        atualizar_status("💾 Ponto de restauração criado com sucesso!", cor="lightgreen")
-        ultimo_ponto = "Ponto_Otimizador_Aoxy"
+        # Após criar, obter o SequenceNumber (ID) do ponto recém-criado
+        try:
+            ps_cmd = "(Get-ComputerRestorePoint | Where-Object {$_.Description -eq 'Ponto_Otimizador_Aoxy'} | Sort-Object -Property CreationTime -Descending | Select-Object -First 1 -ExpandProperty SequenceNumber)"
+            res = subprocess.run(["powershell", "-Command", ps_cmd], capture_output=True, text=True)
+            seq = res.stdout.strip()
+            if seq.isdigit():
+                ultimo_ponto = int(seq)
+                atualizar_status(f"💾 Ponto de restauração criado com sucesso! (ID: {ultimo_ponto})", cor="lightgreen")
+            else:
+                ultimo_ponto = None
+                atualizar_status("⚠️ Ponto criado, mas não foi possível obter o ID do ponto.", cor="orange")
+        except Exception as e_id:
+            ultimo_ponto = None
+            atualizar_status(f"⚠️ Ponto criado, mas falha ao obter ID: {e_id}", cor="orange")
     except Exception as e:
         atualizar_status(f"❌ Erro ao criar ponto de restauração: {e}", cor="red")
         
@@ -77,10 +168,11 @@ def restaurar_ponto():
     if messagebox.askyesno("Restaurar Sistema", 
                            "Deseja realmente restaurar o sistema ao último ponto?\nO PC será reiniciado."):
         try:
+            # Restore-Computer espera um ID numérico (SequenceNumber)
             subprocess.run([
                 "powershell",
                 "-Command",
-                f"Restore-Computer -RestorePoint '{ultimo_ponto}'"
+                f"Restore-Computer -RestorePoint {ultimo_ponto}"
             ], check=True)
             atualizar_status("♻️ Restaurando para o ponto de restauração...", cor="yellow")
         except Exception as e:
@@ -92,6 +184,27 @@ def atualizar_status(texto, cor='white'):
     historico_status.insert(END, texto)
     historico_status.itemconfig(tk.END, fg=cor)
     historico_status.yview(END)
+
+
+def run_and_capture(func, *args, **kwargs):
+    """Executa uma função, captura stdout/stderr e envia as linhas para o quadro de status."""
+    old_out, old_err = sys.stdout, sys.stderr
+    buf = StringIO()
+    sys.stdout = buf
+    sys.stderr = buf
+    try:
+        result = func(*args, **kwargs)
+    except Exception as e:
+        print(f"Erro ao executar {getattr(func, '__name__', str(func))}: {e}")
+        result = None
+    finally:
+        sys.stdout = old_out
+        sys.stderr = old_err
+    output = buf.getvalue()
+    if output:
+        for line in output.splitlines():
+            atualizar_status(line)
+    return result
     
 def executar_acao(texto, cor='white', tempo=2000):
     atualizar_status(texto, cor) 
@@ -100,47 +213,40 @@ def executar_acao(texto, cor='white', tempo=2000):
       
 def desativar_recursos():
    executar_acao('⚡desativando recursos...', cor='lightgreen', tempo=2000)
-   desativar_recursos_func()
 
 def desinstalar_app():
    executar_acao('🗑️desinstalando app...', cor='yellow', tempo=2000)
-   desinstalar_app_func()
 
 def atualizar_drives(): 
    executar_acao('🔄atualizando drives...', cor='lightblue', tempo=2000)
-   atualizar_drives_func()
 
 def limpar_arquivos_desnecessarios(): # ABRIR COMO ADMIN # STATUS NA TELA DO APP
    executar_acao('🗑️excluindo arquivos...', cor='lightgray', tempo=2000)
-   limpar_arquivos_desnecessarios_func()
+   run_and_capture(limpar_arquivos_desnecessarios_func)
 
 def recursos_energia(): 
    executar_acao('⚡ajustando recursos de energia...', cor='red', tempo=2000)
-   recursos_energia_func()
 
 def limpar_cache_navegador(): # STATUS NA TELA DO APP
    executar_acao('🧹limpando cache...', cor='lightgreen', tempo=2000)
-   limpar_cache_navegador_func()
+   run_and_capture(limpar_cache_navegador_func)
 
 def desfragmentar_disco(): # ABRIR COMO ADMIN
    executar_acao('💽desfragmentando disco...', cor='lightgray', tempo=2000)
-   desfragmentar_disco_func()
+   run_and_capture(desfragmentar_disco_func)
 
 def configuracoes_visuais():
    executar_acao('🎨configurando visual...', cor='orange', tempo=2000)
-   configuracoes_visuais_func()
 
 def limpar_prefetch_temp(): # STATUS NA TELA
    executar_acao('🧹limpando prefetch/temp...', cor='blue', tempo=2000)
-   limpar_prefetch_temp_func()
+   run_and_capture(limpar_prefetch_temp_func)
 
 def apps_inicializacao():
    executar_acao('🔄ajustando apps de inicializacao...', cor='purple', tempo=2000)
-   apps_inicializacao_func()
    
 def monitorar_temperatura():
     executar_acao('🔍monitorando temperatura...', cor='lightblue', tempo=2000) 
-    monitorar_temperatura_func()  
 
 
 def finalizar_acao(texto):
@@ -329,6 +435,10 @@ label_footer.pack(side="bottom", fill="x")
 
 # Inicializa com mensagem de boas-vindas
 atualizar_status("🎉 Bem-vindo ao Otimizador Aoxy!", cor ='lightgreen')
+
+# Se o app foi iniciado com a flag para criar ponto automaticamente, agenda a ação após a interface carregar
+if do_create_on_startup:
+    janela.after(500, criar_ponto_restauracao)
 
 
 mainloop()
