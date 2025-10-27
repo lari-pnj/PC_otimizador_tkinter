@@ -1,6 +1,6 @@
 # PC otimizador tkinter
 
-![Screenshot](/img/fundo1.png)
+![Screenshot](/meu_app/main/img/fundo1.png)
 
 ---------
 Um otimizador,**Fácil e intuitivo**,
