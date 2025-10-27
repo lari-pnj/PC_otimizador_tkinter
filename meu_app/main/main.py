@@ -8,6 +8,15 @@ import subprocess
 import os, sys
 from io import StringIO
 
+
+def resource_path(relative_path):
+    """Retorna o caminho correto, mesmo quando empacotado com PyInstaller"""
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 # variável que guarda o último ponto de restauração criado
 ultimo_ponto = None
 
@@ -264,7 +273,7 @@ janela.title('otimizador Aoxy v1.0')
 janela.geometry('800x600')
 janela.config(background="#1e1e2e")
 janela.resizable(False, False)
-janela.iconbitmap(resource_path("img/icon.ico"))
+janela.iconbitmap(resource_path("main/img/icon.ico"))
 
 
 # ======================Frame lateral==========================================
